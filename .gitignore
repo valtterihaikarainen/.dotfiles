@@ -10,3 +10,4 @@
 
 tmp/
 
+stow/zsh/.config/zsh/.secrets.zsh
