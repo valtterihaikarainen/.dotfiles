@@ -1,7 +1,7 @@
 require('keymaps')
 require('options')
 require('plugins')
-require('plugins.keymaps')
+require('tmux')
 -- require('plugins.options')
 -- SET NEOVIM HOST PYTHON (A great place for this is right here)
 vim.g.python3_host_prog = vim.fn.expand("~/.virtualenvs/neovim/bin/python3")

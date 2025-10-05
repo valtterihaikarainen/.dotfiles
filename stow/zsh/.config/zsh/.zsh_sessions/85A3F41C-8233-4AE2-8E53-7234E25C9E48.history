@@ -1,0 +1,11 @@
+cd .dotfiles
+ls -a
+cd stow
+ls -a
+stow zsh -t ~
+stow -D zsh
+stow zsh -t ~
+pwd
+stow zsh -t ~
+stow zsh -t ~
+exec zsh

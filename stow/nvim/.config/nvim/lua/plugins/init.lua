@@ -21,6 +21,10 @@ local lsp = require("plugins.lsp")
 local jupyter = require("plugins.jupyter")
 local jupytext = require("plugins.jupytext")
 local quarto = require("plugins.quarto")
+local latex = require("plugins.latex")
+local tmux = require("plugins.tmux")
+local git = require("plugins.git")
+local smear_cursor = require("plugins.smear_cursor")
 
 -- 3) Concatenate them all into one big list 
 local plugin_list = {}
@@ -38,6 +42,10 @@ extend(plugin_list, lsp)
 extend(plugin_list, jupyter)
 extend(plugin_list, jupytext)
 extend(plugin_list, quarto)
+extend(plugin_list, latex)
+extend(plugin_list, tmux)
+extend(plugin_list, git)
+extend(plugin_list, smear_cursor)
 
 -- ... more
 

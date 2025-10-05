@@ -222,7 +222,6 @@ rmvenv() { # Corrected function name from rmenv
         rm -r "$VENV_HOME/$1"
     fi
 }
-
 # -----------------------------------------------------------------------------
 # SECTION 9
 #
@@ -241,23 +240,7 @@ fi
 # IMPORTANT: This section should be the very last part of the file.
 # -----------------------------------------------------------------------------
 
-# Load zsh-syntax-highlighting. It provides real-time highlighting for commands.
 if [ -f /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ]; then
   source /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 fi
-
-# >>> conda initialize >>>
-# !! Contents within this block are managed by 'conda init' !!
-__conda_setup="$('/Users/valtterihaikarainen/miniconda3/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
-if [ $? -eq 0 ]; then
-    eval "$__conda_setup"
-else
-    if [ -f "/Users/valtterihaikarainen/miniconda3/etc/profile.d/conda.sh" ]; then
-        . "/Users/valtterihaikarainen/miniconda3/etc/profile.d/conda.sh"
-    else
-        export PATH="/Users/valtterihaikarainen/miniconda3/bin:$PATH"
-    fi
-fi
-unset __conda_setup
-# <<< conda initialize <<<
 
