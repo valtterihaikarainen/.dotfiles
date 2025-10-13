@@ -21,3 +21,7 @@ export PYENV_ROOT="$XDG_DATA_HOME"/pyenv
 export PATH="$PYENV_ROOT/bin:$PATH"       
 export PATH="$PYENV_ROOT/shims:$PATH"      
 
+
+# uv
+export PATH="/Users/valtterihaikarainen/.local/share/../bin:$PATH"
+. "$HOME/.cargo/env"

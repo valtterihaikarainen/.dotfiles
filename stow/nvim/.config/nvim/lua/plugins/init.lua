@@ -15,8 +15,7 @@ end
 vim.opt.rtp:prepend(lazypath) -- Prepend lazy to runtime path
 
 -- 2) Import each plugin-spec module 
-local lsp = require("plugins.lsp")
-local git = require("plugins.git")
+-- local lsp = require("plugins.lsp")
 
 -- 3) Concatenate them all into one big list 
 local plugin_list = {}
@@ -28,8 +27,7 @@ local function extend(dst, src)
     end
 end
 
-extend(plugin_list, lsp)
-extend(plugin_list, git)
+-- extend(plugin_list, lsp)
 
 -- 4) Finally, call lazy.nvim's setup
 require("lazy").setup(plugin_list, {
