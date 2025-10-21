@@ -1,0 +1,13 @@
+# macOS noise
+.DS_Store
+# zsh history & caches
+.cache/
+.zcompdump*
+# neovim swap/undo/backup
+*.swp
+*.swo
+*.lua~
+
+tmp/
+
+/local
