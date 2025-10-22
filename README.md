@@ -1,3 +1,9 @@
-WIP
+Basic config for bash, neovim and tmux, that should run on an old toaster*
 
-Different configuration files to work on my personal laptop, mobile phone and university's computing cluster. Loosely based on https://github.com/benlubas/.dotfiles
+On a new computer run: `stow -t ~ common`
+
+*Given Neovim version 0.12 
+
+
+
+
