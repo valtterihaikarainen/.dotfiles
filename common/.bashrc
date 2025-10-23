@@ -25,7 +25,7 @@ shopt -s dirspell 2>/dev/null || true
 alias ..='echo "cd .."; cd ..'
 alias l='ls -a1 --color'
 alias ll='ls -lha'
-alias v='nvim'
+alias v='vim'
 
 # Define color codes - using 256 color mode for better compatibility
 readonly COLOR_RESET='\[\033[0m\]'

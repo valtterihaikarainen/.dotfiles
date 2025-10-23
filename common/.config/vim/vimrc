@@ -1,0 +1,57 @@
+set nocompatible
+set laststatus=2
+set ruler
+set wildmenu
+set relativenumber
+set backspace=indent,eol,start 
+set smartindent 
+set smarttab
+set shiftwidth=4
+set softtabstop=4
+set complete-=i
+set scrolloff=6
+set sidescroll=1 
+set sidescrolloff=2 
+set ttimeout
+set ttimeoutlen=100
+
+let mapleader = " "
+nnoremap <leader>e :Ex<CR>
+nnoremap <leader>w :w<CR>
+nnoremap <leader>q :q<CR>
+nnoremap <leader>o :so<CR>
+nnoremap <silent> <C-L> :nohlsearch<C-R>=has('diff')?'<Bar>diffupdate':''<CR><CR><C-L>
+nnoremap <leader>rc :edit $MYVIMRC<CR>
+
+" Plugin Manager
+let s:plugin_dir = expand('~/.config/vim/plugins')
+
+function! s:ensure(repo)
+  let name = split(a:repo, '/')[-1]
+ let path = s:plugin_dir . '/' . name
+  
+  if !isdirectory(path)
+    if !isdirectory(s:plugin_dir)
+      call mkdir(s:plugin_dir, 'p')
+    endif
+    execute '!git clone --depth=1 https://github.com/' . a:repo . ' ' . shellescape(path)
+  endif
+  execute 'set runtimepath+=' . fnameescape(path)
+endfunction
+
+" Plugins
+call s:ensure('prabirshrestha/vim-lsp')
+call s:ensure('prabirshrestha/asyncomplete.vim')
+call s:ensure('prabirshrestha/asyncomplete-lsp.vim')
+
+if executable('pyright-langserver')
+    au User lsp_setup call lsp#register_server({
+        \ 'name': 'pyright',
+        \ 'cmd': {server_info->['pyright-langserver', '--stdio']},
+        \ 'allowlist': ['python'],
+        \ })
+endif
+
+let g:lsp_diagnostics_enabled = 1
+let g:lsp_signs_enabled = 1
+let g:asyncomplete_auto_popup = 1
