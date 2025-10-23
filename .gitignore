@@ -3,7 +3,7 @@
 # zsh history & caches
 .cache/
 .zcompdump*
-# neovim swap/undo/backup
+# swap/undo/backup
 *.swp
 *.swo
 *.lua~
@@ -11,4 +11,4 @@
 tmp/
 
 /local
-/common/plugins
+common/.config/vim/plugins/
