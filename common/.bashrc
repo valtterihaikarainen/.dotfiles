@@ -78,6 +78,9 @@ build_prompt() {
     PS1+="${COLOR_PROMPT} \$${COLOR_RESET} "      # Classic $ or #
 }
 
+
+fastfetch
+
 # Call the function to build the prompt
 build_prompt
 

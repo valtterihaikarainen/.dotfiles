@@ -1,3 +1,5 @@
+colorscheme default
+
 set nocompatible
 set laststatus=2
 set ruler
@@ -14,14 +16,32 @@ set sidescroll=1
 set sidescrolloff=2 
 set ttimeout
 set ttimeoutlen=100
+set noswapfile
+set noundofile 
 
 let mapleader = " "
 nnoremap <leader>e :Ex<CR>
 nnoremap <leader>w :w<CR>
 nnoremap <leader>q :q<CR>
-nnoremap <leader>o :so<CR>
+nnoremap <leader>o :so $MYVIMRC<CR>
 nnoremap <silent> <C-L> :nohlsearch<C-R>=has('diff')?'<Bar>diffupdate':''<CR><CR><C-L>
 nnoremap <leader>rc :edit $MYVIMRC<CR>
+
+function! Osc52Yank()
+    let buffer=system('base64 -w0', @")
+    let buffer='\e]52;c;'.buffer.'\x07'
+    silent exe "!echo -ne ".shellescape(buffer)." > /dev/tty"
+endfunction
+
+autocmd TextYankPost * call Osc52Yank()
+
+let &t_SI = "\e[5 q"  " Insert mode: vertical bar
+let &t_EI = "\e[2 q"  " Normal mode: block
+let &t_SR = "\e[4 q"  " Replace mode: underline
+
+"###############################################################
+" Plugins
+"###############################################################
 
 " Plugin Manager
 let s:plugin_dir = expand('~/.config/vim/plugins')
@@ -44,14 +64,200 @@ call s:ensure('prabirshrestha/vim-lsp')
 call s:ensure('prabirshrestha/asyncomplete.vim')
 call s:ensure('prabirshrestha/asyncomplete-lsp.vim')
 
+
+"###############################################################
+" LSP 
+"###############################################################
+
+highlight LspReferenceText ctermbg=236 guibg=#303030
+highlight LspReferenceRead ctermbg=236 guibg=#303030
+highlight LspReferenceWrite ctermbg=236 guibg=#303030
+
+highlight LspErrorHighlight cterm=underline ctermfg=Red gui=underline guisp=Red
+highlight LspWarningHighlight cterm=underline ctermfg=Yellow gui=underline guisp=Yellow  
+highlight LspInformationHighlight cterm=underline ctermfg=Blue gui=underline guisp=Blue
+highlight LspHintHighlight cterm=underline ctermfg=Green gui=underline guisp=Green
+
+let g:lsp_semantic_enabled = 1                 
+let g:lsp_diagnostics_enabled = 1    
+let g:lsp_diagnostics_echo_cursor = 1 
+let g:lsp_diagnostics_float_cursor = 0 
+let g:lsp_diagnostics_signs_enabled = 0        
+let g:lsp_diagnostics_virtual_text_enabled = 0 
+let g:lsp_diagnostics_float_delay = 200        
+let g:lsp_document_highlight_enabled = 1       
+let g:lsp_signature_help_enabled = 0           
+let g:lsp_fold_enabled = 0                     
+let g:lsp_code_lens_enabled = 0                
+let g:lsp_inlay_hints_enabled = 0              
+let g:lsp_format_sync_timeout = 0            
+let g:lsp_preview_float = 0                    
+let g:lsp_preview_keep_focus = 1               
+let g:lsp_preview_autoclose = 1                
+let g:lsp_preview_doubly = 0                   
+let g:asyncomplete_auto_popup = 1              
+let g:asyncomplete_min_chars = 2               
+let g:asyncomplete_popup_delay = 100           
+let g:asyncomplete_auto_completeopt = 0        
+let g:asyncomplete_smart_completion = 1        
+let g:asyncomplete_matchfuzzy = 0              
+
+inoremap <expr> <Tab>   pumvisible() ? "\<C-n>" : "\<Tab>"
+inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
+inoremap <expr> <CR>    pumvisible() ? "\<C-y>" : "\<CR>"
+
+function! s:on_lsp_buffer_enabled() abort
+    " Enable omni-completion (Ctrl-X Ctrl-O)
+    setlocal omnifunc=lsp#complete
+    
+    " Control sign column visibility:
+    " signcolumn=no    - Never show
+    " signcolumn=yes   - Always show (prevents jumping)
+    " signcolumn=auto  - Show only when there are signs
+    setlocal signcolumn=no
+    
+    " ---- NAVIGATION ----
+    " Go to where symbol is defined
+    nmap <buffer> gd <plug>(lsp-definition)
+    
+    " Find all references to symbol under cursor
+    " nmap <buffer> gr <plug>(lsp-references)
+    
+    " Go to where symbol is implemented
+    " nmap <buffer> gi <plug>(lsp-implementation)
+    
+    " Go to type definition
+    " nmap <buffer> gt <plug>(lsp-type-definition)
+    
+    " Peek definition in preview window (don't jump)
+    " nmap <buffer> gp <plug>(lsp-peek-definition)
+    
+    " ---- DOCUMENTATION ----
+    " Show documentation/signature for symbol under cursor
+    nmap <buffer> K <plug>(lsp-hover)
+    
+    " Show signature help (function parameters)
+    " nmap <buffer> gs <plug>(lsp-signature-help)
+    
+    " ---- DIAGNOSTICS (Errors/Warnings) ----
+    " Jump to previous diagnostic
+    " nmap <buffer> [g <plug>(lsp-previous-diagnostic)
+    
+    " Jump to next diagnostic
+    " nmap <buffer> ]g <plug>(lsp-next-diagnostic)
+    
+    " Show all diagnostics in location list
+    " nmap <buffer> <leader>d <plug>(lsp-document-diagnostics)
+    
+    " Show all project diagnostics
+    " nmap <buffer> <leader>D <plug>(lsp-workspace-diagnostics)
+    
+    " ---- REFACTORING ----
+    " Rename symbol under cursor everywhere
+    " nmap <buffer> <leader>rn <plug>(lsp-rename)
+    
+    " Show available code actions (imports, fixes, refactorings)
+    " nmap <buffer> <leader>ca <plug>(lsp-code-action)
+    
+    " Show code actions for visual selection
+    " vmap <buffer> <leader>ca <plug>(lsp-code-action)
+    
+    " ---- FORMATTING ----
+    " Format entire document
+    " nmap <buffer> <leader>f <plug>(lsp-document-format)
+    
+    " Format visual selection
+    " vmap <buffer> <leader>f <plug>(lsp-document-range-format)
+    
+    " ---- SYMBOLS ----
+    " Show document symbols (outline of file)
+    " nmap <buffer> <leader>s <plug>(lsp-document-symbol)
+    
+    " Search workspace symbols
+    " nmap <buffer> <leader>S <plug>(lsp-workspace-symbol)
+    
+    " ---- FOLDING ----
+    " Fold/unfold based on LSP
+    " nmap <buffer> zf <plug>(lsp-fold)
+endfunction
+
+"---------------------------------------------------------------
+" LANGUAGE SERVERS
+"---------------------------------------------------------------
+
+" Python - Pyright (type checking, intellisense)
 if executable('pyright-langserver')
     au User lsp_setup call lsp#register_server({
         \ 'name': 'pyright',
         \ 'cmd': {server_info->['pyright-langserver', '--stdio']},
         \ 'allowlist': ['python'],
+        \ 'workspace_config': {
+        \   'python': {
+        \     'analysis': {
+        \       'typeCheckingMode': 'basic',
+        \       'autoSearchPaths': v:true,
+        \       'useLibraryCodeForTypes': v:true,
+        \     }
+        \   }
+        \ }
         \ })
 endif
 
-let g:lsp_diagnostics_enabled = 1
-let g:lsp_signs_enabled = 1
-let g:asyncomplete_auto_popup = 1
+highlight Comment ctermfg=102 guifg=#6c7086
+
+" Values & Constants
+highlight Constant ctermfg=216 guifg=#fab387
+highlight String ctermfg=151 guifg=#a6e3a1
+highlight Character ctermfg=151 guifg=#a6e3a1
+highlight Number ctermfg=216 guifg=#fab387
+highlight Boolean ctermfg=216 guifg=#fab387
+highlight Float ctermfg=216 guifg=#fab387
+
+" Identifiers & Functions
+highlight Identifier ctermfg=252 guifg=#cdd6f4
+highlight Function ctermfg=117 guifg=#89b4fa
+
+" Keywords & Statements
+highlight Statement ctermfg=183 guifg=#cba6f7
+highlight Conditional ctermfg=183 guifg=#cba6f7
+highlight Repeat ctermfg=183 guifg=#cba6f7
+highlight Label ctermfg=183 guifg=#cba6f7
+highlight Operator ctermfg=153 guifg=#89dceb
+highlight Keyword ctermfg=183 guifg=#cba6f7
+highlight Exception ctermfg=183 guifg=#cba6f7
+
+" Preprocessor & Meta
+highlight PreProc ctermfg=218 guifg=#f5c2e7
+highlight Include ctermfg=218 guifg=#f5c2e7
+highlight Define ctermfg=218 guifg=#f5c2e7
+highlight Macro ctermfg=229 guifg=#f9e2af
+highlight PreCondit ctermfg=218 guifg=#f5c2e7
+
+" Types (Style Guide: Blue, not Yellow!)
+highlight Type ctermfg=117 guifg=#89b4fa
+highlight StorageClass ctermfg=117 guifg=#89b4fa
+highlight Structure ctermfg=117 guifg=#89b4fa
+highlight Typedef ctermfg=117 guifg=#89b4fa
+
+" Special & Attributes
+highlight Special ctermfg=218 guifg=#f5c2e7
+highlight SpecialChar ctermfg=218 guifg=#f5c2e7
+highlight Tag ctermfg=183 guifg=#cba6f7
+highlight Delimiter ctermfg=102 guifg=#6c7086
+highlight SpecialComment ctermfg=102 guifg=#6c7086
+highlight Debug ctermfg=211 guifg=#f38ba8
+
+" Builtins (Style Guide: Red)
+highlight Builtin ctermfg=211 guifg=#f38ba8
+
+" UI Elements
+highlight LineNr ctermfg=102 guifg=#6c7086
+highlight CursorLineNr ctermfg=183 guifg=#cba6f7
+highlight Visual ctermbg=237 guibg=#45475a
+highlight Search ctermbg=216 ctermfg=234 guibg=#fab387 guifg=#1e1e2e
+highlight IncSearch ctermbg=211 ctermfg=234 guibg=#f38ba8 guifg=#1e1e2e
+
+" Errors & Warnings
+highlight Error ctermfg=211 ctermbg=NONE guifg=#f38ba8 guibg=NONE
+highlight Todo ctermfg=229 ctermbg=NONE guifg=#f9e2af guibg=NONE
+highlight WarningMsg ctermfg=216 guifg=#fab387
