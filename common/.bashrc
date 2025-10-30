@@ -1,59 +1,93 @@
 #!/usr/bin/env bash
 #
-# If not running interactively, don't do anything
+# Bash Configuration File
+# Personal shell environment settings, aliases, and custom prompt
+
+# =============================================================================
+# INITIAL CHECKS
+# =============================================================================
+
+# Exit if not running interactively
 [[ -n $PS1 ]] || return
+
+# =============================================================================
+# SHELL BEHAVIOR
+# =============================================================================
+
+# Enable vi mode for command line editing
 set -o vi
+
+# Allow Ctrl+L to clear screen in both vi modes
 bind -m vi-command '"\C-l": clear-screen'
 bind -m vi-insert '"\C-l": clear-screen'
-# use vardump instead of parr
-alias parr='vardump'
-# Set environment
-export GREP_COLOR='1;36'
-export HISTCONTROL='ignoredups'
-export HISTSIZE=5000
-export HISTFILESIZE=5000
-export LSCOLORS='ExGxbEaECxxEhEhBaDaCaD'
-export PAGER='less'
-# Shell Options
-shopt -s cdspell
-shopt -s checkwinsize
-shopt -s extglob
-# Bash Version >= 4
-shopt -s autocd   2>/dev/null || true
-shopt -s dirspell 2>/dev/null || true
-# Aliases
-alias ..='echo "cd .."; cd ..'
-alias l='ls -a1 --color'
-alias ll='ls -lha'
-alias v='vim'
 
-# Define color codes - using 256 color mode for better compatibility
+# =============================================================================
+# ENVIRONMENT VARIABLES
+# =============================================================================
+
+export GREP_COLOR='1;36'           # Cyan color for grep matches
+export HISTCONTROL='ignoredups'    # Ignore duplicate commands in history
+export HISTSIZE=5000               # Number of commands to remember
+export HISTFILESIZE=5000           # Number of lines in history file
+export LSCOLORS='ExGxbEaECxxEhEhBaDaCaD'  # BSD ls colors
+export PAGER='less'                # Default pager
+
+# =============================================================================
+# SHELL OPTIONS
+# =============================================================================
+
+shopt -s cdspell        # Autocorrect minor spelling errors in cd
+shopt -s checkwinsize   # Update LINES and COLUMNS after each command
+shopt -s extglob        # Enable extended pattern matching
+
+# Bash 4.0+ features (fail silently on older versions)
+shopt -s autocd   2>/dev/null || true    # cd into directories by typing just the name
+shopt -s dirspell 2>/dev/null || true    # Autocorrect directory names during completion
+
+# =============================================================================
+# ALIASES
+# =============================================================================
+
+alias ..='echo "cd .."; cd ..'     # Go up one directory (with feedback)
+alias l='ls -a1 --color'           # List all files, one per line
+alias ll='ls -lha'                 # Long format with human-readable sizes
+alias v='vim'                      # Quick vim alias
+alias parr='vardump'               # Use vardump instead of parr
+
+# =============================================================================
+# PROMPT COLORS
+# =============================================================================
+# Using 256-color mode for better terminal compatibility
+
 readonly COLOR_RESET='\[\033[0m\]'
 readonly COLOR_BOLD='\[\033[1m\]'
-readonly COLOR_PROMPT='\[\033[38;5;251m\]'
-readonly COLOR_ERROR='\[\033[38;5;197m\]'
-readonly COLOR_OS='\[\033[38;5;245m\]'
-readonly COLOR_USER='\[\033[38;5;33m\]'    
-readonly COLOR_HOST='\[\033[38;5;136m\]'   
-readonly COLOR_PATH='\[\033[38;5;64m\]'    
-readonly COLOR_GIT='\[\033[38;5;61m\]'     
+readonly COLOR_PROMPT='\[\033[38;5;251m\]'   # Light gray for decorative elements
+readonly COLOR_ERROR='\[\033[38;5;197m\]'    # Bright red for errors
+readonly COLOR_ROOT='\[\033[38;5;196m\]'     # Red for root user
+readonly COLOR_USER='\[\033[38;5;33m\]'      # Blue for regular user
+readonly COLOR_HOST='\[\033[38;5;136m\]'     # Yellow/orange for hostname
+readonly COLOR_PATH='\[\033[38;5;64m\]'      # Green for path
+readonly COLOR_GIT='\[\033[38;5;61m\]'       # Purple for git info
 
-# Build the prompt
+# =============================================================================
+# PROMPT CONSTRUCTION
+# =============================================================================
+
 build_prompt() {
-    # Start with newline for breathing room (optional - remove if you don't like it)
+    # Start with newline for visual separation
     PS1="\n"
     
-    # Exit code of last command (only shown if non-zero)
+    # Show exit code of last command (only if non-zero)
     PS1+='$(ret=$?; [ $ret -ne 0 ] && echo "'${COLOR_ERROR}'✗ ($ret) '${COLOR_RESET}'")'
     
-    # Username (red for root, normal color otherwise)
+    # Username (bold red for root, blue for regular users)
     if [[ $EUID -eq 0 ]]; then
         PS1+="${COLOR_ROOT}${COLOR_BOLD}\u${COLOR_RESET}"
     else
         PS1+="${COLOR_USER}\u${COLOR_RESET}"
     fi
     
-    # @ symbol
+    # @ separator
     PS1+="${COLOR_PROMPT}@${COLOR_RESET}"
     
     # Hostname
@@ -62,11 +96,11 @@ build_prompt() {
     # Current directory
     PS1+=" ${COLOR_PROMPT}in${COLOR_RESET} ${COLOR_PATH}\w${COLOR_RESET}"
     
-    # Git branch (if in a git repository)
+    # Git branch indicator (with dirty status)
     PS1+='$(
         branch=$(git rev-parse --abbrev-ref HEAD 2>/dev/null)
         if [[ -n $branch ]]; then
-            # Check if repo is dirty
+            # Check if repository has uncommitted changes
             if [[ -n $(git status --porcelain 2>/dev/null) ]]; then
                 echo " '${COLOR_GIT}'('${COLOR_BOLD}'$branch*'${COLOR_RESET}${COLOR_GIT}')'${COLOR_RESET}'"
             else
@@ -75,36 +109,57 @@ build_prompt() {
         fi
     )'
     
-    PS1+="${COLOR_PROMPT} \$${COLOR_RESET} "      # Classic $ or #
+    # Prompt character ($ for user, # for root)
+    PS1+="\n${COLOR_PROMPT}\$${COLOR_RESET} "
 }
 
+# =============================================================================
+# TERMINAL TITLE
+# =============================================================================
 
-fastfetch
-
-# Call the function to build the prompt
-build_prompt
-
-# Prompt command - sets the terminal title
+# Update terminal window title with user@host:path
 _prompt_command() {
     local user=$USER
-    local host=${HOSTNAME%%.*}
-    local pwd=${PWD/#$HOME/\~}
-    printf "\033]0;%s%s@%s:%s\007" "$user" "$host" "$pwd"
+    local host=${HOSTNAME%%.*}  # Short hostname (strip domain)
+    local pwd=${PWD/#$HOME/\~}  # Replace home dir with ~
+    printf "\033]0;%s@%s:%s\007" "$user" "$host" "$pwd"
 }
-PROMPT_COMMAND=_prompt_command
-PROMPT_DIRTRIM=3  # Show only last 3 directories in path
 
-# Custom prompt for YSAP profile
+PROMPT_COMMAND=_prompt_command
+PROMPT_DIRTRIM=3  # Show only last 3 directory levels in prompt
+
+# =============================================================================
+# PROFILE-SPECIFIC OVERRIDES
+# =============================================================================
+
+# Custom minimal prompt for YSAP iTerm profile
 if [[ $ITERM_PROFILE == 'YSAP-'* ]]; then
     PS1="${COLOR_USER}dave${COLOR_RESET}"
     PS1+="${COLOR_PROMPT}@${COLOR_RESET}"
     PS1+="${COLOR_HOST}ysap${COLOR_RESET} "
     PS1+="${COLOR_PROMPT}❯${COLOR_RESET} "
-    PROMPT_DIRTRIM=1
+    PROMPT_DIRTRIM=1  # Show only current directory
 fi
 
+# =============================================================================
+# SYSTEM INFORMATION DISPLAY
+# =============================================================================
 
-# load completion
+# Display system info on shell startup (if fastfetch is installed)
+if command -v fastfetch &>/dev/null; then
+    fastfetch
+fi
+
+# =============================================================================
+# COMPLETION
+# =============================================================================
+
+# Load bash completion (try system location first, then user location)
 . /etc/bash/bash_completion 2>/dev/null ||
-	. ~/.bash_completion 2>/dev/null
+    . ~/.bash_completion 2>/dev/null
+
+# Call the prompt building function
+build_prompt
+
+# Ensure script always exits successfully
 true
