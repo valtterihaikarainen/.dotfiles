@@ -1,4 +1,3 @@
-colorscheme default
 
 set nocompatible
 set laststatus=2
@@ -19,6 +18,9 @@ set ttimeoutlen=100
 set noswapfile
 set noundofile 
 
+syntax on
+filetype plugin indent on 
+
 let mapleader = " "
 nnoremap <leader>e :Ex<CR>
 nnoremap <leader>w :w<CR>
@@ -26,6 +28,11 @@ nnoremap <leader>q :q<CR>
 nnoremap <leader>o :so $MYVIMRC<CR>
 nnoremap <silent> <C-L> :nohlsearch<C-R>=has('diff')?'<Bar>diffupdate':''<CR><CR><C-L>
 nnoremap <leader>rc :edit $MYVIMRC<CR>
+
+
+"###############################################################
+" Yank to system clipboard with Osc52
+"###############################################################
 
 function! Osc52Yank()
     let buffer=system('base64 -w0', @")
@@ -61,9 +68,6 @@ endfunction
 
 " Plugins
 call s:ensure('prabirshrestha/vim-lsp')
-call s:ensure('prabirshrestha/asyncomplete.vim')
-call s:ensure('prabirshrestha/asyncomplete-lsp.vim')
-
 
 "###############################################################
 " LSP 
@@ -95,12 +99,6 @@ let g:lsp_preview_float = 0
 let g:lsp_preview_keep_focus = 1               
 let g:lsp_preview_autoclose = 1                
 let g:lsp_preview_doubly = 0                   
-let g:asyncomplete_auto_popup = 1              
-let g:asyncomplete_min_chars = 2               
-let g:asyncomplete_popup_delay = 100           
-let g:asyncomplete_auto_completeopt = 0        
-let g:asyncomplete_smart_completion = 1        
-let g:asyncomplete_matchfuzzy = 0              
 
 inoremap <expr> <Tab>   pumvisible() ? "\<C-n>" : "\<Tab>"
 inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
@@ -109,77 +107,15 @@ inoremap <expr> <CR>    pumvisible() ? "\<C-y>" : "\<CR>"
 function! s:on_lsp_buffer_enabled() abort
     " Enable omni-completion (Ctrl-X Ctrl-O)
     setlocal omnifunc=lsp#complete
-    
-    " Control sign column visibility:
-    " signcolumn=no    - Never show
-    " signcolumn=yes   - Always show (prevents jumping)
-    " signcolumn=auto  - Show only when there are signs
     setlocal signcolumn=no
-    
-    " ---- NAVIGATION ----
-    " Go to where symbol is defined
     nmap <buffer> gd <plug>(lsp-definition)
-    
-    " Find all references to symbol under cursor
-    " nmap <buffer> gr <plug>(lsp-references)
-    
-    " Go to where symbol is implemented
-    " nmap <buffer> gi <plug>(lsp-implementation)
-    
-    " Go to type definition
-    " nmap <buffer> gt <plug>(lsp-type-definition)
-    
-    " Peek definition in preview window (don't jump)
-    " nmap <buffer> gp <plug>(lsp-peek-definition)
-    
-    " ---- DOCUMENTATION ----
-    " Show documentation/signature for symbol under cursor
     nmap <buffer> K <plug>(lsp-hover)
-    
-    " Show signature help (function parameters)
-    " nmap <buffer> gs <plug>(lsp-signature-help)
-    
-    " ---- DIAGNOSTICS (Errors/Warnings) ----
-    " Jump to previous diagnostic
-    " nmap <buffer> [g <plug>(lsp-previous-diagnostic)
-    
-    " Jump to next diagnostic
-    " nmap <buffer> ]g <plug>(lsp-next-diagnostic)
-    
-    " Show all diagnostics in location list
-    " nmap <buffer> <leader>d <plug>(lsp-document-diagnostics)
-    
-    " Show all project diagnostics
-    " nmap <buffer> <leader>D <plug>(lsp-workspace-diagnostics)
-    
-    " ---- REFACTORING ----
-    " Rename symbol under cursor everywhere
-    " nmap <buffer> <leader>rn <plug>(lsp-rename)
-    
-    " Show available code actions (imports, fixes, refactorings)
-    " nmap <buffer> <leader>ca <plug>(lsp-code-action)
-    
-    " Show code actions for visual selection
-    " vmap <buffer> <leader>ca <plug>(lsp-code-action)
-    
-    " ---- FORMATTING ----
-    " Format entire document
-    " nmap <buffer> <leader>f <plug>(lsp-document-format)
-    
-    " Format visual selection
-    " vmap <buffer> <leader>f <plug>(lsp-document-range-format)
-    
-    " ---- SYMBOLS ----
-    " Show document symbols (outline of file)
-    " nmap <buffer> <leader>s <plug>(lsp-document-symbol)
-    
-    " Search workspace symbols
-    " nmap <buffer> <leader>S <plug>(lsp-workspace-symbol)
-    
-    " ---- FOLDING ----
-    " Fold/unfold based on LSP
-    " nmap <buffer> zf <plug>(lsp-fold)
 endfunction
+
+augroup lsp_settings
+    autocmd! 
+    autocmd User LspBufferEnabled call s:on_lsp_buffer_enabled()
+augroup END
 
 "---------------------------------------------------------------
 " LANGUAGE SERVERS
@@ -202,6 +138,13 @@ if executable('pyright-langserver')
         \ }
         \ })
 endif
+
+"###############################################################
+" THEME
+"###############################################################
+
+" Terminal emulator Background
+colorscheme default
 
 highlight Comment ctermfg=102 guifg=#6c7086
 
@@ -261,3 +204,4 @@ highlight IncSearch ctermbg=211 ctermfg=234 guibg=#f38ba8 guifg=#1e1e2e
 highlight Error ctermfg=211 ctermbg=NONE guifg=#f38ba8 guibg=NONE
 highlight Todo ctermfg=229 ctermbg=NONE guifg=#f9e2af guibg=NONE
 highlight WarningMsg ctermfg=216 guifg=#fab387
+

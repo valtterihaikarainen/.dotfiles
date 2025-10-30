@@ -12,3 +12,4 @@ tmp/
 
 /local
 common/.config/vim/plugins/
+common/.config/vim/.netrwhist
