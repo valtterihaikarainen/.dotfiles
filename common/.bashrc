@@ -110,7 +110,7 @@ build_prompt() {
     )'
     
     # Prompt character ($ for user, # for root)
-    PS1+="\n${COLOR_PROMPT}\$${COLOR_RESET} "
+    PS1+=" ${COLOR_PROMPT}\$${COLOR_RESET} "
 }
 
 # =============================================================================
