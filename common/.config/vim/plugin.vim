@@ -15,4 +15,4 @@ function! s:ensure(repo)
 endfunction
 
 " Plugins
-call s:ensure('prabirshrestha/vim-lsp')
+" call s:ensure('prabirshrestha/vim-lsp')

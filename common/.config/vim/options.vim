@@ -1,6 +1,4 @@
 set nocompatible
-filetype plugin indent on 
-syntax on
 
 " Line numbers
 set number
@@ -28,6 +26,8 @@ set backspace=indent,eol,start
 set scrolloff=8
 set sidescrolloff=8 
 
+set noshowmatch
+
 set wildmenu
 set complete-=i
 
@@ -37,4 +37,9 @@ set ttimeoutlen=100
 set noswapfile
 set noundofile 
 
+set redrawtime=10000
+set maxmempattern=20000
+
+filetype indent on 
+syntax on
 

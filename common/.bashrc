@@ -21,6 +21,8 @@ set -o vi
 bind -m vi-command '"\C-l": clear-screen'
 bind -m vi-insert '"\C-l": clear-screen'
 
+export EDITOR=nvim
+
 # =============================================================================
 # ENVIRONMENT VARIABLES
 # =============================================================================
@@ -51,8 +53,10 @@ shopt -s dirspell 2>/dev/null || true    # Autocorrect directory names during co
 alias ..='echo "cd .."; cd ..'     # Go up one directory (with feedback)
 alias l='ls -a1 --color'           # List all files, one per line
 alias ll='ls -lha'                 # Long format with human-readable sizes
-alias v='vim'                      # Quick vim alias
+alias v='nvim'                      # Quick nvim alias
 alias parr='vardump'               # Use vardump instead of parr
+alias wlist="nmcli device wifi list" 
+alias wifi="nmcli device wifi connect"
 
 # =============================================================================
 # PROMPT COLORS
@@ -129,19 +133,6 @@ PROMPT_COMMAND=_prompt_command
 PROMPT_DIRTRIM=3  # Show only last 3 directory levels in prompt
 
 # =============================================================================
-# PROFILE-SPECIFIC OVERRIDES
-# =============================================================================
-
-# Custom minimal prompt for YSAP iTerm profile
-if [[ $ITERM_PROFILE == 'YSAP-'* ]]; then
-    PS1="${COLOR_USER}dave${COLOR_RESET}"
-    PS1+="${COLOR_PROMPT}@${COLOR_RESET}"
-    PS1+="${COLOR_HOST}ysap${COLOR_RESET} "
-    PS1+="${COLOR_PROMPT}❯${COLOR_RESET} "
-    PROMPT_DIRTRIM=1  # Show only current directory
-fi
-
-# =============================================================================
 # SYSTEM INFORMATION DISPLAY
 # =============================================================================
 
@@ -161,5 +152,11 @@ fi
 # Call the prompt building function
 build_prompt
 
-# Ensure script always exits successfully
-true
+# =============================================================================
+# Load local 
+# =============================================================================
+
+if [ -f ~/.bashrc.local ]; then
+    source ~/.bashrc.local
+fi
+

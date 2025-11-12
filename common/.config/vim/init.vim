@@ -1,0 +1,1 @@
+/home/vhaikarainen/.dotfiles/common/.config/vim/vimrc

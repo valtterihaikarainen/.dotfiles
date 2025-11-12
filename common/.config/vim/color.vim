@@ -32,6 +32,11 @@
 
 colorscheme default
 
+highlight Normal ctermbg=NONE guibg=NONE
+highlight NonText ctermbg=NONE guibg=NONE
+highlight LineNr ctermbg=NONE guibg=NONE
+highlight SignColumn ctermbg=NONE guibg=NONE
+
 " Terminal emulator Background
 highlight Comment ctermfg=102 
 
